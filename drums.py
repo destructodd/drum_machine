@@ -1,6 +1,13 @@
 #from gpiozero import Motor
+print('begin')
 import time
 import pigpio
+import pygame
+import numpy as np
+
+pygame.init()
+
+timer = pygame.time.Clock()
 
 pi = pigpio.pi()
 
@@ -9,86 +16,83 @@ d = 255
 
 bpm = 90
 bps = bpm/60
+nps = bpm*8
 
-def left_hit():
+def right_hit(d):
     pi.set_PWM_dutycycle(20, d)
     pi.set_PWM_dutycycle(21, 0)
     time.sleep(p)
-    pi.set_PWM_dutycycle(20, 0)
-    pi.set_PWM_dutycycle(21, 0)
-    
     pi.set_PWM_dutycycle(20, 0)
     pi.set_PWM_dutycycle(21, d)
     time.sleep(p)
     pi.set_PWM_dutycycle(20, 0)
     pi.set_PWM_dutycycle(21, 0)
-    
+   
 
-def both_hit():
+def left_hit(d):
     pi.set_PWM_dutycycle(19, d)
     pi.set_PWM_dutycycle(26, 0)
-    pi.set_PWM_dutycycle(20, d)
-    pi.set_PWM_dutycycle(21, 0)
+    time.sleep(p)
+    pi.set_PWM_dutycycle(19, 0)
+    pi.set_PWM_dutycycle(26, d)
     time.sleep(p)
     pi.set_PWM_dutycycle(19, 0)
     pi.set_PWM_dutycycle(26, 0)
-    pi.set_PWM_dutycycle(20, 0)
-    pi.set_PWM_dutycycle(21, 0)
-    #print('out')
     
+def both_hit(d):
+    pi.set_PWM_dutycycle(20, d)
+    pi.set_PWM_dutycycle(19, d)
+    pi.set_PWM_dutycycle(26, 0)
+    pi.set_PWM_dutycycle(21, 0)
+    time.sleep(p)
+    pi.set_PWM_dutycycle(20, 0)
     pi.set_PWM_dutycycle(19, 0)
     pi.set_PWM_dutycycle(26, d)
-    pi.set_PWM_dutycycle(20, 0)
     pi.set_PWM_dutycycle(21, d)
     time.sleep(p)
-    pi.set_PWM_dutycycle(19, 0)
-    pi.set_PWM_dutycycle(26, 0)
     pi.set_PWM_dutycycle(20, 0)
+    pi.set_PWM_dutycycle(19, 0)
+    pi.set_PWM_dutycycle(26, 0)
     pi.set_PWM_dutycycle(21, 0)
-    #print('in')
 
-def right_hit():
-    pi.set_PWM_dutycycle(19, d)
-    pi.set_PWM_dutycycle(26, 0)
-    time.sleep(p)
-    pi.set_PWM_dutycycle(19, 0)
-    pi.set_PWM_dutycycle(26, 0)
-    #print('out')
+arr = np.array([[255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,100],[0,0,100],
+                [255,0,0],[0,100,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,100],[0,0,100],
+                [100,0,0],[0,100,0],[0,0,110],[0,0,100],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255],
+                [255,0,0],[0,255,0],[0,0,255],[0,0,255]])
+
+
+
+run = True
+n = 0
+
+try:
+    for n in arr:
+        print('tick')
+        both_hit(n[0])
+        left_hit(n[1])
+        right_hit(n[2])
     
-    pi.set_PWM_dutycycle(19, 0)
-    pi.set_PWM_dutycycle(26, d)
-    time.sleep(p)
+        timer.tick_busy_loop(nps)
+        
+except KeyboardInterrupt:
+    pi.set_PWM_dutycycle(20, 0)
     pi.set_PWM_dutycycle(19, 0)
     pi.set_PWM_dutycycle(26, 0)
+    pi.set_PWM_dutycycle(21, 0)
+    print('quit')
 
-print("start")
-while True:
-    both_hit()
-    time.sleep((1/bps)/8)
-    right_hit()
-    time.sleep((1/bps)/8)
-    right_hit()
-    time.sleep((1/bps)/8)
-    right_hit()
-    time.sleep((1/bps)/16)
-    right_hit()
-    time.sleep((1/bps)/8)
-#left_hit()
-#left_hit()
-#left_hit()
+    
+        
 
-print('end')
+      
+    
 
-#print("hit")
-#time.sleep(1)
-#pi.set_PWM_dutycycle(21, d)
-#print("retract")
-#print("done")
-#while True: 
-#    left_stick.forward()
-#    print("drum1")
-#    time.sleep(10)
-#    left_stick.backward()
-#    print("drum2")
 
-#print(dir(pigpio.pi))
